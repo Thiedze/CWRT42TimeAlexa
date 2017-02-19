@@ -2,11 +2,30 @@ import logging
 import json
 import time
 import datetime
+from HTMLParser import HTMLParser
+import urllib
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 rt42Sign = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Kreisintegral', '\xc3\x84', '\xc3\x96', '\xc3\x9c', '\xc3\x9f', '@' ]
+
+class MyHTMLParser(HTMLParser):
+    
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.found = False
+        self.data = ""
+    
+    def handle_starttag(self, tag, attrs):
+        for name, value in attrs:
+            if(name == "class" and value == "site-description"):
+                self.found = True
+    
+    def handle_data(self, data):
+        if self.found == True:
+            self.data = data
+            self.found = False
 
 def buildResponse(output):
     return {
@@ -45,6 +64,13 @@ def getNextRtEvening():
     date = date + datetime.timedelta(daysAhead)
     logger.info(date)
     return date.strftime("%d.%m.%Y")
+    
+def getNextCampuswoche():
+    url = urllib.urlopen("http://campuswoche.de/")
+    html = url.read()
+    parser = MyHTMLParser()
+    parser.feed(html)
+    return parser.data
 
 def rt(event, context):
     logger.info('got event{}'.format(event))
@@ -52,5 +78,7 @@ def rt(event, context):
         return buildResponse("Die aktuelle Uhrzeit lautet " + getRt42Time())
     elif(event['request']['intent']['name'] == 'RtNextThursdayIntent'): 
         return buildResponse("Der n\xc3\xa4chste r t Abend ist am " + getNextRtEvening())
+    elif(event['request']['intent']['name'] == 'RtNextCampuswocheIntent'): 
+        return buildResponse("Die n\xc3\xa4chste Campuswoche findet vom " + getNextCampuswoche() + " statt.")
     else:
         return buildResponse("Deine Anfrage f\xc3\xbchrt ins Nichts.")

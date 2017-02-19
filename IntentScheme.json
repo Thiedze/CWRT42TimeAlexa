@@ -1,5 +1,6 @@
 {"intents": [
     {"intent": "RtTimeIntent"},
-    {"intent": "RtNextThursdayIntent"}
+    {"intent": "RtNextThursdayIntent"},
+    {"intent": "RtNextCampuswocheIntent"}
   ]
 }
