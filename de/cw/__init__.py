@@ -74,11 +74,14 @@ def getNextCampuswoche():
 
 def rt(event, context):
     logger.info('got event{}'.format(event))
-    if(event['request']['intent']['name'] == 'RtTimeIntent'):
+    try:
+        if(event['request']['intent']['name'] == 'RtTimeIntent'):
+            return buildResponse("Die aktuelle Uhrzeit lautet " + getRt42Time())
+        elif(event['request']['intent']['name'] == 'RtNextThursdayIntent'): 
+            return buildResponse("Der n\xc3\xa4chste r t Abend ist am " + getNextRtEvening())
+        elif(event['request']['intent']['name'] == 'RtNextCampuswocheIntent'): 
+            return buildResponse("Die n\xc3\xa4chste Campuswoche findet vom " + getNextCampuswoche() + " statt.")
+        else:
+            return buildResponse("Die aktuelle Uhrzeit lautet " + getRt42Time())
+    except:
         return buildResponse("Die aktuelle Uhrzeit lautet " + getRt42Time())
-    elif(event['request']['intent']['name'] == 'RtNextThursdayIntent'): 
-        return buildResponse("Der n\xc3\xa4chste r t Abend ist am " + getNextRtEvening())
-    elif(event['request']['intent']['name'] == 'RtNextCampuswocheIntent'): 
-        return buildResponse("Die n\xc3\xa4chste Campuswoche findet vom " + getNextCampuswoche() + " statt.")
-    else:
-        return buildResponse("Deine Anfrage f\xc3\xbchrt ins Nichts.")
